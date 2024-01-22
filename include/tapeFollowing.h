@@ -27,7 +27,6 @@ public:
 
     void left_turn(int gain);
     void turnR(int leftStop);
-    static void bridge_Left();
     static void bridge_Right();
     static void bridge_Back();
     void handle_interrupt();

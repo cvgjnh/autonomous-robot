@@ -16,68 +16,61 @@ void Sonar::initializeSonar(NewPing* _sonar, NewPing* _backsonar){
     Sonar::back_sonar_ptr = _backsonar;
 }
 
-//
+/**
+ * Calculates the distance based on the duration of the sonar ping and the speed of sound.
+ * 
+ * @param soundcm The speed of sound in centimeters per second.
+ * @return The calculated distance in centimeters.
+ */
 float Sonar::getDist(float soundcm){
     float dur = sonar_ptr->ping_median(ITERATIONS);
     float dist = (dur/200)*soundcm;
     return dist;
 }
 
-int Sonar::detecting(float soundcm, int targ_base_pos, int base_pos, int distance) { //target base position is the estimated position
-// the arm should be in to get the treasure
+/**
+ * Detects the treasure using the sonar sensor.
+ * 
+ * @param soundcm The speed of sound in centimeters per second.
+ * @param targ_base_pos The estimated angular position of the base required to get the treasure.
+ * @param base_pos The current angular position of the base.
+ * @param distance The distance measured by the sonar sensor.
+ * @return Returns 1 if the treasure is detected and picked up, 0 otherwise.
+ */
+int Sonar::detecting(float soundcm, int targ_base_pos, int base_pos, int distance) { 
 
-     int distanceL=-1, distanceR=-1, distanceL2=-1, distanceR2=-1;
-     // int curr_base_pos= getBasePos();
-     const int targL = targ_base_pos - ANGLE;
-     const int targR = targ_base_pos + ANGLE;
-     
-        //int base_pos = Claw::baseRotate(targ_base_pos, Claw::base_servo_ptr->read());
-        //distance = getDist(soundcm);
+    int distanceL=-1, distanceR=-1, distanceL2=-1, distanceR2=-1;
 
-        if (distance < 20 && distance != 0){
-            //Robot stops moving (wheel speed zero) 
-            //Tape::tp_motor_stop();
+    const int targL = targ_base_pos - ANGLE;
+    const int targR = targ_base_pos + ANGLE;
+    
+    // If possible, take a distance measurement to the left and right of the expected target position.
+    if (targL >= LEFTMOST) {
+        base_pos = Claw::baseRotate(targL, base_pos);
+        distanceL = getDist(soundcm);
+    }
 
-            if (targL>=LEFTMOST) {
-                base_pos = Claw::baseRotate(targL, base_pos);
-                distanceL = getDist(soundcm);
-            }
+    if (targR <= RIGHTMOST) {
+        base_pos = Claw::baseRotate(targR, base_pos);
+        distanceR = getDist(soundcm);
+    }
 
-            // if (targ_base_pos-10>=LEFTMOST) {
-            //     base_pos = Claw::baseRotate(targ_base_pos-10, base_pos);
-            //     distanceL2 = getDist(soundcm);
-            // }
+    // By comparing the distance measurements, we can determine if the treasure is present.
+    // The treasure is narrow so if the distance measurements are too close, we have detected a wall.
+    // If a treasure is detected, we can pick it up.
+    if(((distanceL-distance)>= 3 && (distanceR-distance >= 3)) || 
+    ((distanceL-distance) >= 3 && (distanceR == -1)) ||
+    ((distanceR-distance) >= 3 && (distanceL == -1))) { 
 
-            // if (targ_base_pos+10<=RIGHTMOST)  {
-            //     base_pos = Claw::baseRotate(targ_base_pos+10, base_pos);
-            //     distanceR2 = getDist(soundcm);
-            // }
+        int treasure_pos = targ_base_pos;
+        Claw::baseRotate(treasure_pos,Claw::base_servo_ptr->read());
+        Claw::moveRack(EXTENDEDPOS);
+        Claw::clawPickUp(treasure_pos); 
 
-            if (targR<=RIGHTMOST) {
-                base_pos = Claw::baseRotate(targR, base_pos);
-                distanceR = getDist(soundcm);
-            }
-
-            if(((distanceL-distance)>= 3 && (distanceR-distance >= 3)) || 
-            ((distanceL-distance) >= 3 && (distanceR == -1)) ||
-            ((distanceR-distance) >= 3 && (distanceL == -1))) { 
-                //if( abs(distance-distanceL2)<=5 || abs(distance-distanceR2)<=5){ 
-                // rack extends until the IR sensor no longer detects a signal as the idle is between the claw
-                // check the hall effect sensor
-                int treasure_pos = targ_base_pos;
-                Claw::baseRotate(treasure_pos,Claw::base_servo_ptr->read());
-                    Claw::moveRack(EXTENDEDPOS);
-                    Claw::clawPickUp(treasure_pos); 
-
-            
-                //else{}
-                yesTreasure=1;
-            }
-            else{
-
-            }
-        }
-        return yesTreasure;
+        return true;
+    }
+  
+    return false;
 
 }
 

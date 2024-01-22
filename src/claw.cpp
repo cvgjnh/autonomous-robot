@@ -23,9 +23,11 @@ void Claw::initializeBase(Servo* _base_servo){
 }
 
 
-
-
-
+/**
+ * Initializes the claw setup by attaching servo motors and setting initial positions.
+ * This function also initializes the rack position and treasure count variables.
+ * It includes a delay of 4000 milliseconds to allow the servos to stabilize.
+ */
 void Claw::clawSetup() {
   claw_servo_ptr->attach(SERVOCLAW);
   claw_servo_ptr->write(CLAWMAX);
@@ -36,32 +38,15 @@ void Claw::clawSetup() {
   rackPosition = 0;
   treasureCount=0;
   delay(4000);
-
-}
-
-void Claw::rotateZero(int base_current_pos){
-    
-    if(base_current_pos<90){
-        while(base_current_pos<90){
-            base_servo_ptr->write(base_current_pos);
-            base_current_pos++;
-            delay(20);
-        }
-        
-    }
-    else if(base_current_pos>90){
-        while(base_current_pos>90){
-            base_servo_ptr->write(base_current_pos);
-            base_current_pos--;
-            delay(20);
-        }
-        
-    }
-    else{}
 }
 
 
-//returns current position
+/**
+ * Rotates the claw to the target position.
+ * 
+ * @param base_target_pos The target position of the base servo.
+ * @param base_current_pos The current position of the base servo.
+ */
 int Claw::baseRotate(int base_target_pos, int base_current_pos){
     if (base_current_pos< base_target_pos){
         while(base_current_pos < base_target_pos){
@@ -77,11 +62,19 @@ int Claw::baseRotate(int base_target_pos, int base_current_pos){
             delay(10);
         }
     }
-    else{}
     return base_current_pos;
 }
 
-void Claw::clawJoint(int state){ //only 3 states: raised = 1, lowered = 0, zipline2 = 2, default = 3
+/**
+ * Sets the position of the claw joint based on the given state.
+ * 
+ * @param state The state of the claw joint. Valid states are:
+ *              - 1: Raised
+ *              - 0: Lowered
+ *              - 2: Zipline
+ *              - 3: Default
+ */
+void Claw::clawJoint(int state){ //only 3 states: raised = 1, lowered = 0, zipline = 2, default = 3
     int joint_pos;
     if(state == 1){
         for(joint_pos = 0; joint_pos < JOINTMAX; joint_pos +=1){
@@ -89,7 +82,7 @@ void Claw::clawJoint(int state){ //only 3 states: raised = 1, lowered = 0, zipli
             delay(20);
         }
     }
-    else if (state ==0){
+    else if (state == 0){
         for (joint_pos = JOINTMAX; joint_pos > 0; joint_pos -= 1) { 
             joint_servo_ptr->write(180-joint_pos);        
             delay(10);  
@@ -109,7 +102,11 @@ void Claw::clawJoint(int state){ //only 3 states: raised = 1, lowered = 0, zipli
     }
 }
 
-//pinion
+/**
+ * Moves the rack forward by the given distance.
+ * 
+ * @param distancecm The distance to move the rack forward in centimeters.
+ */
 void Claw::ForwardStep(float distancecm) 
 {
   digitalWrite(dir, HIGH);
@@ -123,6 +120,11 @@ void Claw::ForwardStep(float distancecm)
   rackPosition += distancecm;
 }
 
+/**
+ * Moves the rack backward by the given distance.
+ * 
+ * @param distancecm The distance to move the rack backward in centimeters.
+ */
 void Claw::BackwardStep(float distancecm) 
 {
   digitalWrite(dir, LOW);
@@ -136,7 +138,12 @@ void Claw::BackwardStep(float distancecm)
   rackPosition -= distancecm;
 }
 
-//fully retracted is 0 and fully extended is 8.5
+/**
+ * Moves the rack to the given destination.
+ * Note that fully retracted is 0 and fully extended is 8.5.
+ * 
+ * @param destinationcm The destination to move the rack to in centimeters.
+ */
 void Claw::moveRack(float destinationcm) 
 {
     float difference = destinationcm - rackPosition;
@@ -149,48 +156,49 @@ void Claw::moveRack(float destinationcm)
     }
 }
 
-// returns safe = 1 to pick up treasure; if its bomb, claw won't pick up
+
+/**
+ * Checks the state of the claw's hall sensor to determine if a bomb is present.
+ * 
+ * @return 1 if a bomb is detected, 0 otherwise.
+ */
 int Claw::isBomb(){
   int state = digitalRead(HALL);
   int bomb = 0;
   if (state == 0) { //bomb
     bomb = 1;
   }
-  else { // treasure
-  }
   return bomb;
 }
 
+/**
+ * @brief Closes the claw gradually until it reaches the minimum position.
+ * 
+ * This function closes the claw gradually by decreasing the claw position until it reaches the minimum position.
+ * It checks if there is a bomb present using the `isBomb()` function and sets the `safe` flag accordingly.
+ * If a bomb is detected, the `safe` flag is set to 0, indicating that it is not safe to continue closing the claw.
+ * 
+ * @return 1 if the claw was closed safely, 0 if a bomb was detected and the claw was stopped prematurely.
+ */
 int Claw::closeClaw() {
     int safe = 1;
     for (int claw_pos = CLAWMAX; claw_pos > 0; claw_pos -= 1) { 
         if (isBomb() == 1) {
-            safe =0;
+            safe = 0;
         }
 
-        if (safe ==0) {
+        if (safe == 0) {
             break;
         }
         claw_servo_ptr->write(claw_pos);
         delay(10);
     } 
     return safe;
-
-    // bool safe = true;
-    // for (int claw_pos = CLAWMAX; claw_pos > 20; claw_pos -= 1) { 
-    //     claw_servo_ptr->write(claw_pos);
-    //     delay(10);
-    // } 
-    // safe = !isBomb();
-    // if (safe) {
-    //     for (int claw_pos = 20; claw_pos > 0; claw_pos -= 1) { 
-    //     claw_servo_ptr->write(claw_pos);
-    //     delay(10);
-    // } 
-    // }
-    // return safe;
 }
 
+/**
+ * Opens the claw by gradually increasing the position of the claw servo.
+ */
 void Claw::openClaw() {
     for (int claw_pos = claw_servo_ptr->read(); claw_pos <= CLAWMAX; claw_pos += 1) { 
         claw_servo_ptr->write(claw_pos);
@@ -198,28 +206,27 @@ void Claw::openClaw() {
     }
 }
 
-void Claw::clawPickUp(int current_base_pos){ //sonar successfully detects treasure
+/**
+ * Picks up a treasure using the claw.
+ * Used when the sonar sensor detects a treasure.
+ * 
+ * @param current_base_pos The current angular position of the base servo.
+ */
+void Claw::clawPickUp(int current_base_pos){ 
 
-    //close claw
     int safe = closeClaw();
     
     if (safe == 1) {
-        //centre the base
-        //if (treasureCount % 2 == 0) {
-            current_base_pos = baseRotate(90, current_base_pos);
-        //}
-        //else {
-            //current_base_pos = baseRotate(90-30,current_base_pos);
-        //}
-        
 
+        current_base_pos = baseRotate(90, current_base_pos);
+        
         //rack to depositing position
         moveRack(DEPOSITPOS);
 
         //raise joint
         clawJoint(1);
 
-        //open claw
+        //open claw to drop treasure
         openClaw();
 
         //lower joint
@@ -228,14 +235,14 @@ void Claw::clawPickUp(int current_base_pos){ //sonar successfully detects treasu
         //return to rack original position
         moveRack(RETRACTEDPOS);
 
-        rotateZero(current_base_pos);
+        baseRotate(90, current_base_pos);
 
         treasureCount++;
     }
     else {
         openClaw();
         moveRack(RETRACTEDPOS);
-        rotateZero(current_base_pos);
+        baseRotate(90, current_base_pos);
     }
 }
 

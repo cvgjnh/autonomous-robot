@@ -15,7 +15,7 @@ void pinSetup()
     pinMode(R_R_Sensor, INPUT_PULLUP);
     pinMode(R_L_Sensor_2, INPUT_PULLUP);
     pinMode(R_R_Sensor_2, INPUT_PULLUP);
-    pinMode(enc_L, INPUT);
+    pinMode(enc_L,INPUT_PULLUP);
     pinMode(Left_Sensor,INPUT_PULLUP);
     pinMode(Right_Sensor,INPUT_PULLUP);
 
@@ -23,19 +23,14 @@ void pinSetup()
     pinMode(stp, OUTPUT);
     pinMode(dir, OUTPUT);
 
-    //sonar
-
     //hall effect
-     pinMode(HALL, INPUT);   
+    pinMode(HALL, INPUT);   
 
-     pinMode(enc_L,INPUT_PULLUP);
-     //pinMode(enc_R,INPUT_PULLUP);
-
-     //IR sensor
-     pinMode(IR_Left_Switch, OUTPUT);
-     pinMode(IR_Right_Switch, OUTPUT);
-     pinMode(IR_Sensor, INPUT);
-     pinMode(IR_Discharge, OUTPUT);
+    //IR sensor
+    pinMode(IR_Left_Switch, OUTPUT);
+    pinMode(IR_Right_Switch, OUTPUT);
+    pinMode(IR_Sensor, INPUT);
+    pinMode(IR_Discharge, OUTPUT);
      
 
 

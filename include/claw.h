@@ -15,7 +15,6 @@ public:
     static void initializeClaw(Servo* _claw_servo);
     static void initializeJoint(Servo* _joint_servo);
     static void initializeBase(Servo* _base_servo);
-    static void rotateZero(int base_current_pos);
     static int baseRotate(int base_target_pos, int base_current_pos);
     static void clawJoint(int state);
     static void clawPickUp(int base_pos);
@@ -24,7 +23,7 @@ public:
     static void ForwardStep(float distancecm);
     static void BackwardStep(float distancecm);
     static void moveRack(float destinationcm);
-    static int getBasePos(int base_pos); //???
+    static int getBasePos(int base_pos); 
     static int isBomb();
 };
 

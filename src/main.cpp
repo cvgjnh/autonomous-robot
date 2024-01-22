@@ -165,10 +165,7 @@ void loop() {
 
 }
 
-void handle_interrupt() {
-  //Tape_following.handle_interrupt();
-  
-}
+
 
 
 
