@@ -27,7 +27,7 @@ void Encoders::drive(int leftStop, int speedL)
 {
   countL = 0;
 
-  //Robot starts moving with said speed
+  // Robot starts moving with said speed
   pwm_start(MOTOR_R_B, MOTOR_FREQ, 0, RESOLUTION_12B_COMPARE_FORMAT);
   pwm_start(MOTOR_R_F, MOTOR_FREQ, speedL, RESOLUTION_12B_COMPARE_FORMAT);
   pwm_start(MOTOR_L_F, MOTOR_FREQ, speedL, RESOLUTION_12B_COMPARE_FORMAT);
@@ -77,7 +77,7 @@ void Encoders::turnR(int leftStop)
 
 /**
  * This function moves the robot backwards at a specified speed until the left encoder count reaches a specified stop value.
- * 
+ *
  * @param leftStop The stop value for the left encoder count.
  * @param speedL The speed at which the robot should move backwards.
  */

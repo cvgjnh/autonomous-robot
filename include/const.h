@@ -90,14 +90,6 @@ const float DEPOSITPOS = 8                                      ;
 //HALL
 #define bombThreshold 100
 
-//TAPE FOLLOWING
-// #define BASE_SPEED 300
-// #define RR_Threshold 38
-// #define RL_Threshold 84
-// #define CW_Threshold 500
-// #define RL2_Threshold 100
-// #define RR2_Threshold 100
-
 #define MOTOR_FREQ 300
 
 //Encoders
