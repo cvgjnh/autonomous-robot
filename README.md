@@ -1,6 +1,6 @@
 # Autonomous Robot
 
-This repository contains the code used to control team Bing Chilling's robot in the ENPH 253 competition of 2022.
+This repository contains the code used to control team Bing Chilling's robot in the Robot Summer competition of 2022.
 
 The goal of the competition was to build an autonomous robot, completely from scratch, that could traverse the obstacle course shown below, while collecting as many points as possible. The team of four who’s robot collects the most points by picking up treasures and bringing them to the finish line wins! To make it through the course, the robot has to overcome many challenges, including:
 - following black tape up a ramp 
